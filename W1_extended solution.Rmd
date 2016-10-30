@@ -1,0 +1,35 @@
+---
+title: "Computer workshop 1 (NBS8186)"
+author: "Edu Gonzalo Almorox"
+date: "30/10/2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This document contains explained solutions to the questions for the Workshop 1. Analysis is based on `nba.csv` file. These are intented to guide the practice of successive workshops.  
+
+
+## Question a
+
+Prior to load the data you must set the working directory in your computer. The working directory is the place in your computer where you allocate the information that you are going to use in your data analysis. `setwd()` is the function to tell R the working directory. Sometimes you may be using several working directories. In order to know the current working directory you are working on you may use `getwd()` 
+
+
+```{r include = TRUE, echo =TRUE}
+
+setwd("/Users/Personas/My Cloud/PhD _october_2016/teaching/NBS8186/data")
+getwd() # what working directory?
+```
+
+Once the working directory is established, it is time to load the data. The most common way to input a dataset in R consists of using the base function `read.csv()`.
+
+```{r include = TRUE, echo =TRUE}
+
+data_nba = read.csv("nba.csv", sep = ",", header = TRUE)
+
+```
+
