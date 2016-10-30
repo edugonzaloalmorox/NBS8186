@@ -1,0 +1,133 @@
+---
+title: "Computer workshop 1 (NBS8186)"
+author: "Edu Gonzalo Almorox"
+date: "30/10/2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This document contains commented solutions to the questions of Workshop 1 for _NBS8186 Introductory Economics_. Analysis is based on `nba.csv` file.
+
+## Question A
+
+_Download the data set from Blackboard and save it on your h: drive. Then open the data set in R and make it the default data set._
+
+
+Prior to load the data you must set the working directory in your computer. The working directory is the place in your computer where you allocate the information that you are going to use in your data analysis. `setwd()` is the function to tell R the working directory in your computer^[Note: The way to introduce the path may differ in case you are using Windows or Mac. For Windows it looks like `"C:/Users/User Name/Documents/FOLDER"` whereas for Mac it is similar to `"/Users/User Name/Documents/FOLDER"`]. Sometimes you may be using several working directories. In order to know the current working directory you are working on you may use `getwd()` 
+
+
+```{r include = TRUE, echo =TRUE}
+
+setwd("/Users/Personas/My Cloud/PhD _october_2016/teaching/NBS8186/data")
+getwd() # what working directory?
+```
+
+Once the working directory is established, it is time to load the data. The most common way to input a dataset in R consists of using the base^[There are other packages such as `foreign` or `rio` that can also be used for loading data.] function `read.csv()`.
+
+```{r include = TRUE, echo =TRUE}
+
+nba = read.csv("nba.csv", sep = ",", header = TRUE)
+
+```
+
+The data are in your computer, now may carry out some exploratory analysis of your data. For example you may want to have a look at the first and last rows. This can be done using `head()` and `tail()`.
+
+```{r include = TRUE, echo =TRUE}
+
+head(nba, 5) # gives the first five lines 
+
+tail(nba, 5) # gives the last five lines
+  
+```
+
+Also, it is possible to see the structure of your data frame using `str()`
+
+
+```{r include = TRUE, echo =TRUE}
+
+str(nba) 
+  
+```
+
+## Question B
+
+_Have a look at the summary statistics of the data set._
+
+`summary()` is used to get a summary statistics of the variables in your data frame.
+
+```{r include = TRUE, echo =TRUE}
+
+summary(nba) 
+
+```
+
+_What is the average age of the players?_
+
+
+According to the results displayed by `summary()` we can see that the average age is 27.4 years. An alternative way to obtain the average age would be by calling directly the variable `age` using the operator `$`. 
+
+```{r include = TRUE, echo =TRUE}
+
+mean(nba$age) 
+
+```
+
+_How many play forwards?_
+
+`forward` is a categorical variable. In these variables, numbers indicate qualitative characteristics that cannot be measured. This type of variables are called `factors()` in R. A simple way to summarise the number of categories in a factor is by using `table()`^[There are alternative and more efficient ways to carry out this task. `data.table` and `dplyr` are the most suited packages when there are bigger samples.]
+
+```{r include = TRUE, echo =TRUE}
+
+table(nba$forward)
+
+```
+
+We can see that 109 players play forwards against 158 that play in other positions i.e. center and guard.
+
+## Question C 
+
+_Plot a histogram of points-per-game._
+
+Histograms give a visual idea about the distribution of a variable. A way for plotting a simple histogram would be by using `hist()` and adding `points` variable. 
+
+```{r include = TRUE, echo =TRUE}
+
+# Histogram 
+
+    # xlab = rename the axis X
+    # main = title of the plot      
+    
+hist(nba$points, xlab= "points", main = "Histogram of points")
+
+   
+
+```
+
+We can see that most of players score between 5 and 10 points per match. 
+
+## Question D 
+
+_Produce a scatterplot of points-per-game versus years in league._
+
+Scatter plots represent the associating between two variables. A way of doing it is by using function `plot()`. Until now we have been using an object (e.g variables) that is "residing" in another object (e.g. a data frame). The easy (and natural) way to refer to them is by using `$`. However, when there are more objects involved (e.g. several variables), typing `$` systematically can be confusing (specially with long names) and increase errors. In order to avoid this, it is possible to use `with()` to _attach_ the data frame and use the variables independently^[R has a `attach()` function that can be used to make objects within dataframes accessible in R without calling to the data frame. Yet the use of this function is not recommended. See the [Google R Style Guide](https://google.github.io/styleguide/Rguide.xml#attach) for details.].
+
+```{r include = TRUE, echo =TRUE}
+
+# Scatterplot 
+
+    # xlab = rename the axis X
+    # ylab = rename the axis Y
+    # main = title of the plot      
+    
+with(nba, plot(points, exper, xlab= "points", ylab = "experience", 
+               main = "Scatterplot of points vs experience"))
+
+
+```
+
+
