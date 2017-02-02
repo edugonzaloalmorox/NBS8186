@@ -1,0 +1,55 @@
+---
+title: 'NBS8186: Computer Lab 1'
+author: "Edu Gonzalo Almorox"
+date: e.gonzalo-almorox@newcastle.ac.uk
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(dplyr)
+library(rio)
+library(tibble)
+```
+
+
+
+
+## R in a nutshell 
+
+What is [R](https://www.r-project.org)?   _programming language_, _environment_, _software_...
+
+Pros: 
+
+  - Object programming 
+  - Open source and free
+  - Compatibility with other languages i.e., Phyton, Javascript
+
+Cons:
+
+  - Important learning curve 
+  - Documentation sometimes far from perfect.
+      
+    
+ What can you do with R?
+
+  - Data analysis
+  - Data visualisation
+  - Dynamic documents
+  - ... 
+
+
+## Is R a good investment?
+
+![_Scholary articles in Google Scholar with no SPSS and SAS_](http://i0.wp.com/r4stats.com/wp-content/uploads/2012/04/Fig_2e_ScholarlyImpactSubset.png)
+Source: www.r4stats.com
+
+## Goals for today
+
+
+
+- 1. Load data in R
+- 2. Manipulate data 
+- 3. Fit and interpret econometric models 
+

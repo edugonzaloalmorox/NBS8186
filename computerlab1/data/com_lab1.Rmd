@@ -1,0 +1,445 @@
+---
+title: 'NBS8186: Computer Lab 1'
+author: "Edu Gonzalo Almorox"
+date: "14/11/2016"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(dplyr)
+library(rio)
+library(tibble)
+```
+
+
+
+## Introduction 
+
+
+Goals for session 1.
+
+- Load data in R
+- Manipulate data 
+- Fit and interpret econometric models 
+
+## R in a nutshell 
+
+What is [R](https://www.r-project.org)?   _programming language_, _environment_, _software_...
+
+Pros: 
+
+  - Object programming 
+  - Open source and free
+  - Compatibility with other languages i.e., Phyton, Javascript
+
+Cons:
+
+  - Important learning curve 
+  - Documentation sometimes far from perfect.
+      
+    
+ What can you do with R?
+
+  - Data analysis
+  - Data visualisation
+  - Dynamic documents
+  - ... 
+
+
+## Is R a good investment?
+
+![_Scholary articles in Google Scholar with no SPSS and SAS_](http://i0.wp.com/r4stats.com/wp-content/uploads/2012/04/Fig_2e_ScholarlyImpactSubset.png)
+Source: www.r4stats.com
+
+
+
+
+## Data structures 
+
+In R every element is regarded as an object. Objects are data structures that group data according to specific attributes. Most general data structures are organised by two elements
+
+  - Dimensionality 
+  - Type of the contents (homogeneous, heterogeneous)
+    
+      1. **`numeric or character`**: single number of letter
+      
+      2. **`Vector`**: 1 dimension, homogeneous objects.
+      
+      3. **`List`**: 1 dimension, heterogenous objects - (different objects grouped together)
+      
+      3. **`Matrix`**: more than 1 dimension, homogenous objects 
+      
+      4. **`Data frame`**: more than 1 dimension, heterogenous objects. 
+      
+  
+
+## Data structures: examples 
+
+
+ This is a `vector`
+```{r, echo = FALSE, include = TRUE}
+
+v =c(1,2,3,4)
+v
+```
+
+ This is a `list`
+```{r, echo = FALSE, include = TRUE}
+
+l = list(c(1:5), c("a","b","c", "d", "e"))
+l
+```
+
+This is a `data.frame`
+```{r, echo = FALSE, include = TRUE}
+df = data.frame(numbers = c(1,2), letters = c("a", "b") )
+df
+```
+
+## Data frames 
+
+`data.frames` are the most common data structure for gathering information.
+
+  - **Variables**: Collect different arguments associated with the information to be analysed - diffrent formats (numbers, strings, factors, dates, ...)
+  - **Observations**: Units of analysis (individuals, firms, etc...) - e.g. the rows of your dataset.
+  
+```{r, echo = FALSE, include = TRUE}
+setwd("/Users/Personas/My Cloud/PhD _october_2016/teaching/NBS8186/data")
+nba = import("nba.csv")
+ nba[1:5, 1:7]
+```
+   
+
+## Before you start
+
+In the (likely) case of crisis
+
+  + Specialised websites - e.g. [stackoverflow.com](http://stackoverflow.com/questions/tagged/r)
+  + [R Mailing lists](https://www.r-project.org/mail.html)
+  + `help`, `help.search()`, `??(name package/name function)`
+  
+## R Studio 
+![RStudio screen](/Users/Personas/My Cloud/PhD _october_2016/teaching/NBS8186/data/Rstudioscreen.png)
+
+
+
+## Programming your analysis
+
+Why writing code?
+
+- Helps to keep track of what you are doing. 
+- Reduces the sources of error.
+- Increases your productivity and efficiency - similar code for differnet analyses.
+- Enhances collaborations.
+
+R language 
+
+- Packages contain libraries that perform functions. 
+- Functions are composed by arguments. 
+
+```{r, echo = TRUE, include=TRUE}
+df = data.frame(numbers = c(1,2), letters = c("a", "b") )
+
+```
+
+## Task 1: Load the data in R
+
+There are two possible ways to input information: 
+
+- *Manually*
+- *Import* from somewhere
+
+ The majority of the analyses import data: 
+
+- Data are delivered in different formats.
+- Important to understand how the information is structured. 
+
+```{r, echo = TRUE, eval = FALSE}
+
+# working directory
+setwd("your_PC/comp_lab1") 
+
+install.packages("") # for installing packages 
+library("") # for loading libraries
+
+```
+
+## Task 1: Load the data in R'cont
+
+**QA**: _Download the data set from Blackboard and save it on your h: drive. Then open the data set in R and make it the default data set._
+
+```{r, echo = TRUE, eval = FALSE}
+
+# working directory
+setwd("") 
+
+install.packages("") # for installing packages 
+library("") # for loading libraries
+
+# loading data 
+
+read.csv()
+import() #'rio() package'
+
+```
+
+## Task 2: Preliminar exploratory analyses 
+
+```{r include = TRUE, echo =TRUE}
+
+nba = read.csv("nba.csv", sep = ",", header = TRUE)
+
+```
+
+- How is the structure of your data? 
+
+```{r eval = FALSE, echo =TRUE}
+
+head(df) # gives the first lines 
+
+tail(df) # gives the last lines
+
+str(df) # types of variables
+  
+```
+
+## Task 2: Summary 
+
+**QB**: _Have a look at the summary statistics of the data set. What is the average age of the players?_
+
+- `summary()` is used to get a summary statistics of the variables in your data frame.
+
+```{r eval = FALSE, echo =TRUE}
+
+summary(nba) # also referred to variables  
+
+```
+
+- An alternative way to obtain the average age would be by calling directly the variable `age` using the operator `$`. 
+
+```{r include = TRUE, echo =TRUE}
+
+mean(nba$age) 
+
+```
+
+
+## Task 2'cont: Counts of categories
+
+**QB cont'**: _How many play forwards?_
+
+- What class of data is `forward`?
+- `table()` summarises the number of categories in a factor.^[There are alternative and more efficient ways to carry out this task. `data.table` and `dplyr` are the most suited packages when there are bigger samples.].
+
+```{r include = TRUE, echo =TRUE}
+
+table(nba$forward)
+
+```
+
+## Task 2'cont: Histograms 
+
+**QC**: _Plot a histogram of points-per-game._
+
+
+```{r include = TRUE, echo =FALSE}
+
+# Histogram 
+
+    # xlab = rename the axis X
+    # main = title of the plot      
+    
+hist(nba$points, xlab= "points", main = "Histogram of points")
+  
+```
+
+## Task 2'cont: Histograms 
+
+- `hist()` is the simplest way for plotting a histogram.^[Package `ggplot2` offers a wide range of histograms and other plotting alternatives.]
+
+
+```{r eval = FALSE, echo =TRUE}
+
+# Histogram 
+
+    # xlab = rename the axis X
+    # main = title of the plot      
+    
+hist(nba$points,
+     xlab= "points",
+     main = "Histogram of points")
+  
+```
+
+## Task 2'cont: Scatterplots 
+
+**QD**:_Produce a scatterplot of points-per-game versus years in league._
+
+- Scatterplots represent the association between two variables.
+- A way of doing it is by using function `plot()` and `with()` to _attach_ the data frame and use the variables independently
+
+
+```{r eval = FALSE, echo =TRUE}
+
+# Scatterplot 
+
+    # xlab = rename the axis X
+    # ylab = rename the axis Y
+    # main = title of the plot      
+    
+with(nba, plot(points, exper, 
+               xlab= "points", 
+               ylab = "experience", 
+               main = "Scatterplot of points vs 
+               experience"))
+
+```
+
+## Task 2'cont: Scatterplots
+
+```{r include = TRUE, echo =FALSE}
+
+# Scatterplot 
+
+    # xlab = rename the axis X
+    # ylab = rename the axis Y
+    # main = title of the plot      
+    
+with(nba, plot(points, exper, xlab= "points", ylab = "experience", 
+               main = "Scatterplot of points vs experience"))
+
+
+```
+
+## Task 3: Regression models 
+
+**QE**: _Run a regression of points-per-game on years in league, age, years played in college and position dummies._
+
+- We need libraries `stats` and `AER`
+- `lm` estimates a linear model using ordinary least squares (OLS). 
+-  The variable before "` ~ `" indicates the dependent variable whereas the variables in the right side are considered the set of explanatory regressors. 
+-  `model1` is a fitted-model object.
+
+```{r eval = FALSE, echo =TRUE, message = FALSE}
+
+library(stats)
+library(AER)
+
+ model1 = lm(points ~ exper + age + coll +
+               forward + center, 
+               data = nba)
+ 
+ summary(model1)
+```
+
+## Task 3: Regression models 
+
+What can we say of our fitted model? 
+
+- Experience has a statistically significant influence in the perfomance - an additional year of experience implies 1.4 additional points per game.
+- Age and years playing at college (`coll`) play a negative role (Question F)
+- All the coefficients are jointly signifcant. 
+
+## Task 3: Correlation matrix 
+
+**QG**: _Look at the correlation matrix_
+
+```{r eval = FALSE, echo =TRUE, message = FALSE}
+
+library(Hmisc)
+library(dplyr)
+
+# select variables from the model 
+vars_mod = nba %>% select(exper, age, coll,
+                          forward, center)
+    # note: subsetting using pipes 
+
+# correlation matrix 
+cor_mat <- rcorr(as.matrix(vars_mod), type = "pearson")
+emphasize.strong.cells(which(cor_mat[[3]] < 0.001,
+                             arr.ind = TRUE))
+
+```
+
+## Task 3: Correlation matrix 
+
+**QG'cont**: _Do you need to worry about multicollinearity?_
+
+- How is the Pearson correlation coefficient?
+- Is this correlation significant?
+
+
+## Task 3: Generate new variables 
+
+ **QH**:_Generate a new variable which is experience squared and include it in the regression._
+ 
+ - Simplest solution^[This solution includes a base package. Yet, `dplyr` presents more flexible options for creating various variables under a number of conditions] - e.g. indexing 
+
+```{r eval = FALSE, echo =TRUE, message = FALSE}
+ nba$expersq =nba$exper^2
+```
+
+**QH'cont**: _Holding age, coll, center and forward fixed, at what value of experience does the next year of experience reduce points-per-game?_
+
+```{r eval = FALSE, echo =TRUE, message = FALSE}
+  
+# include 'expersq'
+model2 = lm(points ~ exper+expersq+age+coll+
+               center+forward, 
+              data = nba)
+ 
+```
+
+## Task 3: Transform variables 
+
+
+- Sometimes we need to transform variables. 
+- Log transformation is normally used.
+- Interpretation of coeficients may change. 
+
+**QI**:_Now you want to explain the log(wage)_
+
+```{r eval = FALSE, echo =TRUE, message = FALSE}
+ nba$logwage = with(nba, log(wage))
+```
+
+- `model3` is expressed as follows 
+
+```{r eval = FALSE, echo =TRUE, message = FALSE}
+
+# include 'logwage'
+model3 <- lm(logwage~points+exper+expersq+age+coll, 
+             data = nba)
+```
+
+## Task 3: Transform variables cont'
+
+_How do you interpret the results?_
+
+ A log transformation in the depedent variable in this case will interpreted as a percent change. 
+ 
+- Points obtained would suppose an increase of 7% in the wage.
+- An additional year of experience would suppose an increase of the 22.3%. 
+
+## Task 3: Model comparison - ANOVA test 
+
+**QJ**:_Test whether age and coll are jointly significant in the regression from (i). What does this imply about whether age and education have a separate effect on wage, once productivity and senority are controlled for?_
+
+```{r eval = FALSE, echo =TRUE, message = FALSE}
+
+
+mod_unrest <- lm(logwage~points+exper+expersq+
+                   age+coll, data = nba)
+mod_rest <- lm(logwage~points+exper+expersq, data = nba)
+
+anova(mod_rest, mod_unrest)
+```
+
+## Recap 
+
+- Writing code helps to control the workflow. 
+- Loading data depends notably on how what type of format you have - normally is `.csv`.
+- There are different ways to access data in R. Common ways are through  `$`and functions such as `which`.
+- It is important to understand how to define the relationship between the dependent and independent variables. Also, variables may have transformations and it can have implications in terms of interpretation.   
