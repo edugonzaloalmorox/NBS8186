@@ -1,0 +1,272 @@
+---
+title: "Computer workshop 2 (NBS8186)"
+author: "Edu Gonzalo Almorox"
+date: ""
+output: pdf_document
+---
+
+## Introduction 
+
+These are sample solutions for the second computer lab of NBS8186. The data used for the analysis correspond to `clothing.csv`. You should have downloaded this data in a specific folder in your computer using `setwd()`. 
+
+## Question A
+
+_Plot a histogram for `tsales`_
+
+First we load the data setting the working directory and loading the dataset. It will be called "clothing". Unlike last computer lab this time we will use `import()` from `rio` package. 
+
+```{r include = TRUE, echo = FALSE}
+
+setwd("/Users/Personas/My Cloud/PhD _october_2016/teaching/NBS8186/computerlab2/data")
+library(rio)
+
+
+clothing = import("clothing.csv")
+```
+
+Creating a histogram is done by using `ggplot2()` which uses aesthetics of the graphics.
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+# Histogram 
+library(ggplot2)
+      
+    
+m <- ggplot(clothing, aes(x = tsales))
+m + geom_histogram() + ggtitle("Sales in Dutch guilders")
+
+```
+
+_What are the mean and the median?_
+
+We have several options. We could use `summary()` and calling `tsales`. Alternatively, we could calculate the mean and median applying directly the `mean()` and `median()` functions on `tsales`. 
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+# mean and median
+
+summary(clothing$tsales)
+
+
+
+```
+
+_Plot `sales` against `ssize`_
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+# Histogram 
+
+library(ggplot2)
+p <- ggplot(clothing, aes(sales, ssize))
+p + geom_point() + ggtitle("Sales vs ssize")
+      
+
+```
+
+## Question B
+
+_Redo a) considering `sales`_
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+# Histogram 
+library(ggplot2)
+      
+    
+m <- ggplot(clothing, aes(x = sales))
+m + geom_histogram() + ggtitle("Sales per square meter")
+
+```
+
+The `mean` and the `median` are calculated using the functions `mean` and `median`^[Results can be checked using `summary()`]
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+# mean
+
+mean(clothing$sales)
+
+# median
+
+median(clothing$sales)
+
+```
+
+## Question C 
+
+_Regress sales on ssize. Interpret._
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+mod1 = lm(sales ~ ssize, clothing)
+summary(mod1)
+
+```
+
+This simple model is a simple linear regression where we analyse the relationship between to variables. A dependent variables `sales` and a regressor `ssize`. We want to see to what extent the sales floor space of the store is related to the number of sales per square meter. 
+
+The can see that there is a negative relationship so that an additional square meter in the floor space supposes almost 10 sales less (9.76 exactly). This negative effect is statistically significant. 
+
+## Question D
+
+_Regress sales on ssize and ssize squared. Interpret. Is there evidence for a nonlinear relationship? If yes, what type of extremum do you find?_
+
+First we have to create the variable ssize squared `ssize2`. Then we run the model with the new variable created. Since there is more than one regressor, we are fitting a multiple linear regression. 
+
+By adding the squared regressor we are assuming that the relationship  between that regressor and the dependent variable is going to change _-wears off-_ at some point. The value of the estimate of the squared term indicates actually the turning point of the relationship. 
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+clothing$ssize2 = clothing$ssize^2
+
+mod2 = lm(sales ~ ssize + ssize2, clothing)
+
+summary(mod2)
+
+
+
+```
+
+If the sign of the squared regressor is poitive, the relationship is a convex model (so it is a *minimum*) and conversely if the sign is negative then the curve is concave (and therefore a *maximum*). 
+
+In our case, the sign of the squared variable is positive so it would suppose a minimum and it would only significant at 0.05 level of significance.
+
+
+## Question E 
+
+_Regress sales on nown, nfull, npart, naux, inv1, inv2, ssize and ssize squared_
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+mod3 =lm( sales~nown+nfull+npart+naux+inv1+inv2+ssize+ssize2, clothing)
+summary(mod3)
+
+```
+
+_(i) Interpret your results._ 
+ 
+All the variables have a positive association with sales excepting the space of the floor for sales.
+
+_(ii) Is the regression significant_
+
+Yes because of the F-Statistic. 
+
+_(iii) Test whether $\beta_{inv} = 0$_
+ 
+ It is.  `Pr(>|t|)` is greater than any other value of significance. 
+ 
+_(iv) Test whether $\beta_{nown} = 1000$_
+
+A general procedure to test the value of a coefficient against an alternative value to 0 consists of calculating the density function of the _t statistic_
+
+\begin{equation}
+t = \frac{\hat\beta - \beta_{H_{0}}}{s.e(\hat\beta)}
+\end{equation}
+
+`tidy()` creates a `data.frame` with the results of the regression. 
+
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+
+library(broom)
+mod3.tidy = tidy(mod3)
+
+t = (mod3.tidy[2, 2] - 1000)/mod3.tidy[2,3]
+pt(t, df = 391)
+
+```
+
+We cannot reject the $H_{0}$ at a level of significance $\alpha > 0.1$ so that we would say that $\beta_{nown} = 1000$.
+
+
+_(v) Test whether $\beta_{nfull} = 2\beta_{npart}$_
+
+Applying (1) we can calculate the following 
+
+\begin{equation}
+t.1 = \frac{\hat\beta_n{full} - \beta_{H_{0}}}{s.e(\hat\beta)}
+\end{equation}
+
+```{r include = TRUE, echo =TRUE, message = FALSE}
+
+library(broom)
+mod3.tidy = tidy(mod3)
+
+t.1 = (mod3.tidy[3,2] - 2*(mod3.tidy[4,2]))/mod3.tidy[3,2]
+pt(t.1, df = 391)
+
+```
+
+We cannot reject the $H_{0}$ at a level of significance $\alpha > 0.1$ so that we would say that $\beta_{nown} = 1000$.
+
+
+_(vi) Use a Chow test to see whether the relationship is the same for stores with start $>=40$ and $<=40$._
+
+
+
+The Chow test tests the implicit assumption of $\beta$ are constant over the whole sample. Essentially what we are testing is whether there are structural breaks $H_{0}: \beta_{ur1} = \beta_{ur2}$ and $H_{1}: \beta_{ur1} \neq \beta_{ur2}$
+
+The procedure consists of various steps 
+
+-  Run a restricted regression 
+- Divide the sample into tow groups that are detemined by the breakpoint ($sales >= 40$)
+- Run an “unrestricted” regression on each of your subsamples.  You will run two “unrestricted” regressions with a single breakpoint.
+- Calculate the Chow F-statistic as follows
+
+\begin{equation}
+\frac{SSR_{r} - SSR_{u}/k}{SSR_{u}/(n-2k)} = F_{k,n - 2k}
+\end{equation}
+```{r eval = TRUE, echo =TRUE, message = FALSE}
+
+# Step 1: Create the regression 
+mod3.1 =lm(sales~nown+nfull+npart+naux+inv1+inv2+ssize+ssize2, subset(clothing,
+                                                                      start <= 40))
+summary(mod3.1)
+
+mod3.2 <- lm(sales~nown+nfull+npart+naux+inv1+inv2+ssize+ssize2, subset(clothing,
+                                                                        start>40))
+summary(mod3.2)
+
+# Step 2: Create the residuals
+SSR = NULL
+SSR$r = mod3$residuals^2
+SSR$ur1 = mod3.1$residuals^2
+SSR$ur2 = mod3.2$residuals^2
+
+K = mod3$rank
+
+# Step 3: Compute the Chow 
+numerator = (sum(SSR$r) - (sum(SSR$ur1) + sum(SSR$ur2)) ) / K
+denominator = (sum(SSR$ur1) + sum(SSR$ur2))/(nrow(clothing) - 2*K)
+
+chow = numerator / denominator
+chow
+
+
+# Step 4: Compute the p-value
+
+pchow = 1-pf(chow, K, (nrow(clothing) - 2*K))
+pchow
+```
+
+We cannot reject the $H_{0}$ so we can conclude that the relationship is the same with stores that started before the 40s and after. 
+
+## Question F
+
+_Plot the squared residuals from the original regression in (e) against the explanatory variables. Do you find evidence of heteroskedasticity? How could you test for heteroskedasticity using a regression?_
+
+Homocedasticity is an assumption of the classical (linear) model. Under homocedasticity the error terms are constant and have the value of the variance ($V(\epsilon_{i}) = \sigma^2$). In case the former does not hold, then we have heterokedasticity. You can have a visual analysis of the heterokedasticity by plotting the residuals of the model against the explanatory variable
+
+
+```{r eval = TRUE, echo =TRUE, message = FALSE}
+# Pattern of heterokedasticity
+plot(clothing$ssize, mod3$residuals^2 ) 
+```
+
+In case you want to use regression, then you have to regress the squared residuals against the explanatory variable. The estimates are considered how much the dependent variable changes under changes of the dependent variables. If $\beta = 0$ then it does not change with additional units and therefore there is homocedasticity.
+
+```{r eval = TRUE, echo =TRUE, message = FALSE}
+m4 <- lm( mod3$residuals^2 ~ ssize, clothing)   # slope is significant -> heteroskedasticity
+summary(m4)
+``
